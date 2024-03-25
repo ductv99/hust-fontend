@@ -41,10 +41,12 @@ const Header = ({ isHisddensearch = false, isHisddenCart = false }) => {
     }
 
     useEffect(() => {
+        setLoading(true)
         setUserName(user?.name)
         setImageUser(user?.avatar)
         setCountCart(order?.orderItems?.length)
-    }, [user?.name, user?.avatar, order?.orderItems?.length])
+        setLoading(true)
+    }, [user?.name, user?.avatar])
 
     const onSearch = (e) => {
         setSearch(e.target.value)
