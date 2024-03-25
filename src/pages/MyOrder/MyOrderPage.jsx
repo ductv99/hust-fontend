@@ -23,7 +23,7 @@ const MyOrderPage = () => {
         queryFn: fetchMyOrder,
     });
 
-    if (state?.id && state?.access_token) {
+    if (state?.id && state?.token) {
         queryOrder()
     }
     const mutation = useMutationHook(

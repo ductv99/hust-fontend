@@ -49,7 +49,6 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://hust-backend.onrender.com",
   "devDependencies": {
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
