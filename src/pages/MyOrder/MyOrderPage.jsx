@@ -15,7 +15,7 @@ const MyOrderPage = () => {
     const user = useSelector((state) => state.user)
     const { state } = location
     const fetchMyOrder = async () => {
-        const res = await OrderService.getOrderByUserId(state?.id, state?.access_token);
+        const res = await OrderService.getOrderByUserId(state?.id, state?.token);
         return res.data;
     };
     const queryOrder = useQuery({
@@ -23,9 +23,10 @@ const MyOrderPage = () => {
         queryFn: fetchMyOrder,
     });
 
-    if (state?.id && state?.token) {
-        queryOrder()
-    }
+    // if (state?.id && state?.token) {
+    //     queryOrder()
+    // }
+
     const mutation = useMutationHook(
         (data) => {
             const { id, token, orderItems, userId } = data
