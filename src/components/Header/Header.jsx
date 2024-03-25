@@ -45,7 +45,7 @@ const Header = ({ isHisddensearch = false, isHisddenCart = false }) => {
         setUserName(user?.name)
         setImageUser(user?.avatar)
         setCountCart(order?.orderItems?.length)
-        setLoading(true)
+        setLoading(false)
     }, [user?.name, user?.avatar])
 
     const onSearch = (e) => {
