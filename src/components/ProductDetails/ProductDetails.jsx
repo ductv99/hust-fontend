@@ -70,6 +70,9 @@ const ProductDetails = ({ idProduct }) => {
         } else if (!selectedSize) {
             checkRq = false
             message.success('Vui lòng chọn size')
+        } else if (numberProduct <= 0) {
+            checkRq = false
+            message.success('Nhập số lượng')
         }
 
         if (checkRq) {
