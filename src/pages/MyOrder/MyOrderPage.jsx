@@ -98,7 +98,7 @@ const MyOrderPage = () => {
                                 }>
                                     <WrapperStatus>
                                         <span style={{ fontSize: '14px', fontWeight: 'bold' }}>Trạng thái</span>
-                                        {order?.statusOrder === true ?
+                                        {order?.statusOrder === 3 ?
                                             <span style={{ color: 'red' }}>
                                                 Đơn hàng đã bị hủy
                                             </span>
@@ -112,6 +112,10 @@ const MyOrderPage = () => {
                                                     <span style={{ color: 'rgb(255, 66, 78)' }}>Thanh toán: </span>
                                                     <span style={{ color: 'rgb(90, 32, 193)', fontWeight: 'bold' }}>{`${order.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}`}</span>
                                                 </div>
+                                                <div>
+                                                    <span style={{ color: 'rgb(255, 66, 78)' }}>Trạng thái đơn hàng: </span>
+                                                    <span style={{ color: 'rgb(90, 32, 193)', fontWeight: 'bold' }}>{`${order.statusOrder === 1 ? "Chờ xác nhận" : order.statusOrder === 2 ? "Đơn hàng đã được xác nhận" : ""}`}</span>
+                                                </div>
                                             </>
                                         }
                                     </WrapperStatus>
@@ -124,20 +128,23 @@ const MyOrderPage = () => {
                                             >{convertPrice(order?.totalPrice)}</span>
                                         </div>
 
-                                        {order?.statusOrder != true &&
+                                        {order?.statusOrder !== 3 &&
                                             <div style={{ display: 'flex', gap: '10px' }}>
-                                                <ButtonComponent
-                                                    onClick={() => handleCanceOrder(order)}
-                                                    size={40}
-                                                    styleButton={{
-                                                        height: '36px',
-                                                        border: '1px solid #9255FD',
-                                                        borderRadius: '4px'
-                                                    }}
-                                                    label={'Hủy đơn hàng'}
-                                                    styleTextButton={{ color: '#9255FD', fontSize: '14px' }}
-                                                >
-                                                </ButtonComponent>
+                                                {
+                                                    order?.statusOrder !== 2 && <ButtonComponent
+                                                        onClick={() => handleCanceOrder(order)}
+                                                        size={40}
+                                                        styleButton={{
+                                                            height: '36px',
+                                                            border: '1px solid #9255FD',
+                                                            borderRadius: '4px'
+                                                        }}
+                                                        label={'Hủy đơn hàng'}
+                                                        styleTextButton={{ color: '#9255FD', fontSize: '14px' }}
+                                                    >
+                                                    </ButtonComponent>
+                                                }
+
                                                 <ButtonComponent
                                                     onClick={() => handleDetailsOrder(order?._id)}
                                                     size={40}

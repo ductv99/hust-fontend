@@ -158,8 +158,6 @@ const AdminProduct = () => {
         ];
         // const allSizes = Object.values(sizesByColor);
 
-        console.log(countInStock);
-
 
         const params = {
             name: stateProduct.name,
@@ -174,7 +172,7 @@ const AdminProduct = () => {
         }
         mutation.mutate(params)
         setIsModalOpen(false);
-        queryProduct.refetch()
+        // queryProduct.refetch()
 
 
     }
@@ -185,7 +183,8 @@ const AdminProduct = () => {
         if (isSuccess) {
             handleCancel()
             message.success()
-            // queryProduct.refetch()
+            queryProduct.refetch()
+            queryProductType.refetch()
         } else if (isError) {
             message.error()
         }
@@ -380,7 +379,6 @@ const AdminProduct = () => {
             setIsPendingUpdate(true)
             fetchGetDetailProduct(rowSelected)
         }
-
     }, [rowSelected, isOpenDrawer])
 
     useEffect(() => {
@@ -392,7 +390,6 @@ const AdminProduct = () => {
             setSelectedSizeWhite([])
             setSelectedSizeBlack([])
             setSelectedSizePink([])
-
         }
         // console.log("eff", stateProductDetail)
     }, [form, stateProductDetail, isModalOpen])
@@ -409,7 +406,6 @@ const AdminProduct = () => {
     }
 
     const onUpdateProduct = () => {
-
         const {
             name,
             price,
@@ -419,9 +415,10 @@ const AdminProduct = () => {
             image,
             discount,
             countInStock,
-            type
+            type,
         } = stateProductDetail;
 
+        console.log(type)
         mutationUpdate.mutate({
             id: rowSelected,
             name,
@@ -432,7 +429,7 @@ const AdminProduct = () => {
             image,
             discount,
             countInStock,
-            type,
+            type: stateProductDetail.type === "add_type" ? stateProductDetail.newType : stateProductDetail.type,
             token: user?.access_token,
         }, {
             onSettled: () => {
@@ -456,13 +453,12 @@ const AdminProduct = () => {
             type: value
         })
     }
-
     const handleCancelDelete = () => {
         setIsModalOpenDelele(false)
     }
 
     const DeleteProduct = () => {
-        console.log(rowSelected)
+        // console.log(rowSelected)
         mutationDelete.mutate({ id: rowSelected, token: user?.access_token },
             {
                 onSettled: () => {
@@ -489,6 +485,7 @@ const AdminProduct = () => {
             </div>
         )
     }
+
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
             <div
@@ -664,7 +661,6 @@ const AdminProduct = () => {
                     isLoading={isLoading}
                     handleDeleteMany={handleDeleteManyProduct}
                     onRow={(record, rowIndex) => {
-                        console.log('o', record._id)
                         return {
                             onClick: event => {
                                 setRowSelected(record._id)
@@ -971,12 +967,12 @@ const AdminProduct = () => {
                         <Form.Item
                             label="Giảm giá"
                             name="discount"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập giảm giá',
-                                },
-                            ]}
+                            // rules={[
+                            //     {
+                            //         required: true,
+                            //         message: 'Vui lòng nhập giảm giá',
+                            //     },
+                            // ]}
                         >
                             <InputComponent value={setStateProduct.discount} onChange={handleOnchange} name="discount" />
                         </Form.Item>
@@ -1054,13 +1050,13 @@ const AdminProduct = () => {
                     <Form
                         name="basic"
                         labelCol={{
-                            span: 7,
+                            span: 11,
                         }}
                         wrapperCol={{
-                            span: 18,
+                            span: 10,
                         }}
                         style={{
-                            maxWidth: 600,
+                            maxWidth: 500,
                         }}
                         initialValues={{
                             remember: true,
@@ -1113,26 +1109,10 @@ const AdminProduct = () => {
                                 ]}
                             >
                                 {stateProductDetail.type === 'add_type' && <InputComponent
-                                    value={stateProductDetail.newType} onChange={handleOnchange}
+                                    value={stateProductDetail.newType} onChange={handleOnchangeDetail}
                                     name="newType" />}
                             </Form.Item>
                         )}
-                        {/* <Form.Item
-                            label="Hàng trong kho"
-                            name="countInStock"
-                        >
-                            {stateProductDetail && Array.isArray(stateProductDetail.countInStock) && (
-                                stateProductDetail.countInStock.map((item) => (
-                                    <div key={item.id} style={{ display: 'flex', gap: 2, paddingTop: '5px' }}>
-                                        <span>Số lượng:</span>
-                                        <span>{item.quantity}</span>
-                                        <div style={{ width: '28px', height: '28px', border: '1px solid blue', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                            <div style={{ width: '25px', height: '25px', backgroundColor: item.color }}></div>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </Form.Item> */}
                         <Form.Item
                             label="Giá"
                             name="price"

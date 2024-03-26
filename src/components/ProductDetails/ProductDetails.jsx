@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Col, Row } from "antd";
 import { StarFilled, PlusOutlined, MinusOutlined } from "@ant-design/icons"
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
@@ -16,18 +16,19 @@ import * as ProductService from '../../service/ProductService'
 import { useQuery } from "@tanstack/react-query";
 import Loading from "../../components/Loading/Loading";
 import { useLocation, useNavigate } from "react-router-dom";
-import { addOrderProduct } from "../../redux/slides/orderSlice";
+import { addOrderProduct, resetCart } from "../../redux/slides/orderSlice";
 import { convertPrice } from "../../untils";
 import * as message from '../../components/Message/Message'
-
-
+import { useMutationHook } from "../../hook/userMutationHook";
+import * as OrderService from '../../service/OrderService'
 
 const ProductDetails = ({ idProduct }) => {
     const navigate = useNavigate()
-    const location = useLocation()
-    const [numberProduct, setNumberProduct] = useState(1)
-    const user = useSelector((state) => state?.user)
     const order = useSelector((state) => state.order)
+    const location = useLocation()
+    const [numberProduct, setNumberProduct] = useState(0)
+    const user = useSelector((state) => state?.user)
+    // const order = useSelector((state) => state.order)
     const dispatch = useDispatch()
     const onChange = (value) => {
         setNumberProduct(Number(value))
@@ -58,10 +59,6 @@ const ProductDetails = ({ idProduct }) => {
         }
         return stars;
     };
-
-
-
-
     const handleAddOrderProduct = () => {
         let checkRq = true
         if (!user?.id) {
@@ -103,6 +100,61 @@ const ProductDetails = ({ idProduct }) => {
             message.success('Đã thêm vào giỏ hàng')
         }
     }
+    const fetchCart = async () => {
+        const res = await OrderService.getAllCartByUserId(user?.id, user?.access_token)
+        if (res.data.length > 0) {
+            const cartItems = res.data[0].orderItems;
+            const uniqueItems = cartItems.filter((cart, index, self) => {
+                return self.findIndex((item) => item.sizeId === cart.sizeId) === index;
+            });
+            if (order) {
+                dispatch(resetCart())
+                uniqueItems.forEach((cart) => {
+                    dispatch(
+                        addOrderProduct({
+                            orderItem: {
+                                name: cart.name,
+                                amount: cart.amount,
+                                image: cart.image,
+                                price: cart.price,
+                                product: cart.product,
+                                discount: cart.discount,
+                                sizeId: cart.sizeId,
+                                color: cart.color,
+                                size: cart.size,
+                            },
+                        })
+                    );
+                });
+            }
+        }
+    }
+    const mutationAddCart = useMutationHook(
+        async (data) => {
+            const {
+                token,
+                ...rests } = data
+            const res = await OrderService.createCart(
+                { ...rests }, token)
+            return res
+        },
+    )
+    const createCart = () => {
+        if (user?.access_token && order?.orderItems && user?.id) {
+            mutationAddCart.mutate({
+                token: user?.access_token,
+                orderItems: order?.orderItems,
+                user: user?.id,
+            })
+        }
+    }
+    const { isSuccess, status } = mutationAddCart
+    useEffect(() => {
+        createCart()
+        if (isSuccess && status === "success") {
+            fetchCart()
+        }
+    }, [order])
 
 
     const [selectedImage, setSelectedImage] = useState(productDetail?.image[0]);
@@ -122,7 +174,7 @@ const ProductDetails = ({ idProduct }) => {
     const handleSizeClick = (size) => {
         setSelectedSize(size);
     };
-
+    let qty;
     return (
         <Loading isPending={isLoading}>
             <Row style={{ padding: '16px', background: '#fff', borderRadius: '4px', height: 'fit-content', width: '1280px', margin: 'auto' }}>
@@ -219,33 +271,28 @@ const ProductDetails = ({ idProduct }) => {
                     <div style={{ margin: '5px 0 5px', padding: '5px 0', borderTop: '1px solid #e5e5e5' }}>
                         <span style={{ fontWeight: 'bold' }}>Size:</span>
                         <div style={{ display: 'flex', flexDirection: 'row', gap: 10, paddingTop: '5px' }}>
-                            {selectedSizes?.map((item) => {
-                                return (
-                                    <div
-                                        key={item?._id}
-                                        style={{
-                                            width: '28px',
-                                            height: '28px',
-                                            border: `1px solid ${selectedSize === item.size ? 'red' : 'rgb(11, 119, 226)'}`,
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            cursor: 'pointer'
-                                        }}
-                                        onClick={() => {
-                                            handleSizeClick(item.size);
-                                        }}
-                                    >
-                                        <div style={{ width: '25px', height: '25px', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                            {item.size}
-                                        </div>
-                                    </div>
-
-                                )
-                            })}
+                            {selectedSizes?.map((item) => item.quantity === 0 ? "Sản phẩm tạm thời hết hàng" : <div
+                                key={item?._id}
+                                style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    border: `1px solid ${selectedSize === item.size ? 'red' : 'rgb(11, 119, 226)'}`,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={() => {
+                                    handleSizeClick(item.size);
+                                }}
+                            >
+                                <div style={{ width: '25px', height: '25px', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                    {item.size}
+                                </div>
+                            </div>)}
                         </div>
                     </div>
-                    
+
                     <div style={{ margin: '10px 0 20px', padding: '10px 0', borderTop: '1px solid #e5e5e5', borderBottom: '1px solid #e5e5e5' }}>
                         <div style={{ marginBottom: '6px', fontWeight: 'bold' }}>Số lượng: </div>
                         <WrapperQualityProduct>
@@ -259,6 +306,9 @@ const ProductDetails = ({ idProduct }) => {
                                 </button>
                             </div>
                         </WrapperQualityProduct>
+                        {
+                            selectedSizes?.map((item) => item.quantity < numberProduct ? "Sản phẩm không đủ số lượng" : "")
+                        }
                     </div>
                     <div style={{ display: 'flex', aliggItems: 'center', gap: '12px' }}>
                         <div>

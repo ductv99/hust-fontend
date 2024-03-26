@@ -21,7 +21,7 @@ const SignInPage = () => {
     const [isShowPassword, setIsShowPassword] = useState(false)
     const [email, setEmail] = useState('')
     const dispatch = useDispatch();
-
+  
     const [password, setPassword] = useState('')
     const navigate = useNavigate()
 
@@ -66,9 +66,10 @@ const SignInPage = () => {
 
         const res = await UserService.getDetailsUser(id, token)
         // console.log('res', res)
-
         dispatch(updateUser({ ...res?.data, access_token: token, refresh_token }))
+
     }
+
     return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0, 0, 0, 0.53)', height: '100vh' }}>
             <div style={{ width: '500px', height: '445px', borderRadius: '6px', background: '#fff' }}>

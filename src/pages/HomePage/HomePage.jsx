@@ -5,16 +5,16 @@ import Banner from "../../components/Banner/Banner";
 import Card from "../../components/Card/Card";
 import { useQuery } from "@tanstack/react-query";
 import *  as ProductService from "../../service/ProductService"
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Loading from "../../components/Loading/Loading";
 import { useDebounce } from "../../hook/useDebounce";
+
 
 const HomePage = () => {
     const [category, setCategory] = useState([])
     const searchProduct = useSelector((state) => state?.product?.search)
     const searchDebounce = useDebounce(searchProduct, 1000)
     // const [loading, setLoading] = useState(false)
-
     const [limit, setLimit] = useState(6)
     const fetchProductAllType = async () => {
         const res = await ProductService.getAllProductType()

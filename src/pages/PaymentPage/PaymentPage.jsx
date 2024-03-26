@@ -145,6 +145,10 @@ const PaymentPage = () => {
         }
     }, [isSuccess, isError])
 
+    useEffect(() => {
+        createCart()
+    }, [order?.orderItems])
+
     const handleCancleUpdate = () => {
         setStateUserDetails({
             name: '',
@@ -193,7 +197,25 @@ const PaymentPage = () => {
         }
         document.body.appendChild(script)
     }
-
+    const mutationAddCart = useMutationHook(
+        async (data) => {
+            const {
+                token,
+                ...rests } = data
+            const res = await OrderService.createCart(
+                { ...rests }, token)
+            return res
+        },
+    )
+    const createCart = () => {
+        if (user?.access_token && order?.orderItems && user?.id) {
+            mutationAddCart.mutate({
+                token: user?.access_token,
+                orderItems: order?.orderItems,
+                user: user?.id,
+            })
+        }
+    }
 
     useEffect(() => {
         if (!window.paypal) {
