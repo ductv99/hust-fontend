@@ -11,9 +11,9 @@ import { useDispatch } from 'react-redux'
 import { resetUser } from "../../redux/slides/userSile";
 import Loading from "../Loading/Loading";
 import { searchProduct } from "../../redux/slides/productSlide";
-import { resetCart } from "../../redux/slides/orderSlice";
-
-
+import { addOrderProduct, resetCart } from "../../redux/slides/orderSlice";
+import * as OrderService from '../../service/OrderService'
+import { useQuery } from "@tanstack/react-query";
 
 const Header = ({ isHisddensearch = false, isHisddenCart = false }) => {
     const navigate = useNavigate()
@@ -26,6 +26,7 @@ const Header = ({ isHisddensearch = false, isHisddenCart = false }) => {
     const [countCart, setCountCart] = useState('')
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false)
+
     const handleNavLogin = () => {
         navigate('/sign-in')
     }
@@ -46,12 +47,54 @@ const Header = ({ isHisddensearch = false, isHisddenCart = false }) => {
         setImageUser(user?.avatar)
         setCountCart(order?.orderItems?.length)
         setLoading(false)
-    }, [user?.name, user?.avatar])
+    }, [user?.name, user?.avatar, order?.orderItems?.length])
 
     const onSearch = (e) => {
         setSearch(e.target.value)
         dispatch(searchProduct(e.target.value))
     }
+
+    const fetchCart = async () => {
+        const res = await OrderService.getAllCartByUserId(user?.id, user?.access_token)
+        if (res.data.length > 0) {
+            const cartItems = res.data[0].orderItems;
+            const uniqueItems = cartItems.filter((cart, index, self) => {
+                return self.findIndex((item) => item.sizeId === cart.sizeId) === index;
+            });
+            console.log(uniqueItems)
+            if (order) {
+                dispatch(resetCart())
+                uniqueItems.forEach((cart) => {
+                    dispatch(
+                        addOrderProduct({
+                            orderItem: {
+                                name: cart.name,
+                                amount: cart.amount,
+                                image: cart.image,
+                                price: cart.price,
+                                product: cart.product,
+                                discount: cart.discount,
+                                sizeId: cart.sizeId,
+                                color: cart.color,
+                                size: cart.size,
+                            },
+                        })
+                    );
+                });
+            }
+        }
+    }
+    const queryCart = useQuery({
+        queryKey: ['cart'],
+        queryFn: fetchCart,
+    });
+
+    useEffect(() => {
+        if (user?.id) {
+            queryCart.refetch()
+        }
+    }, [])
+
     const content = (
         <div>
             {user?.isAdmin && (

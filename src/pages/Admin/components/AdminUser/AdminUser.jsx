@@ -184,7 +184,6 @@ const AdminUser = () => {
     }, [isSuccessDelete])
     useEffect(() => {
         if (isSuccessDeleteMany && dataDeleteMany?.status === "success") {
-
             message.success()
             // queryProduct.refetch()
         } else if (isErrorDeleteMany) {

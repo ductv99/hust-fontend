@@ -68,3 +68,21 @@ export const createCart = async (data, access_token) => {
     })
     return res.data
 }
+
+export const getAllCartByUserId = async (id, access_token) => {
+    const res = await axiosJWT.get(`${process.env.REACT_APP_API_KEY}/order/get-all-cart/${id}`, {
+        headers: {
+            token: `Bearer ${access_token}`
+        }
+    })
+    return res.data
+}
+
+export const updateCartStatus = async (id, data, access_token) => {
+    const res = await axiosJWT.put(`${process.env.REACT_APP_API_KEY}/order/update-cart-status/${id}`, data, {
+        headers: {
+            token: `Bearer ${access_token}`
+        }
+    })
+    return res.data
+}

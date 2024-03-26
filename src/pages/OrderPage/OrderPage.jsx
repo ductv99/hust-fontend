@@ -4,7 +4,7 @@ import { WrapperInputNumber } from '../../components/ProductDetails/styled'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import { CustomCheckbox, WrapperCountOrder, WrapperInfo, WrapperItemOrder, WrapperLeft, WrapperListOrder, WrapperRight, WrapperStyleHeader, WrapperStyleHeaderDilivery, WrapperTotal } from './styled';
-import { decreaseAmount, increaseAmount, removeAllOrderProduct, removeOrderProduct, selectedOrder } from "../../redux/slides/orderSlice";
+import { addOrderProduct, decreaseAmount, increaseAmount, removeAllOrderProduct, removeOrderProduct, resetCart, selectedOrder } from "../../redux/slides/orderSlice";
 import { convertPrice } from "../../untils";
 import ModalComponent from "../../components/ModalComponent/ModalComponent"
 import { Form } from 'antd';
@@ -14,9 +14,10 @@ import * as UserService from '../../service/UserService'
 import Loading from "../../components/Loading/Loading";
 import { updateUser } from "../../redux/slides/userSile";
 import * as message from '../../components/Message/Message'
-
+import * as OrderService from '../../service/OrderService'
 import { useNavigate } from "react-router-dom";
 import StepComponent from "../../components/StepComponent/StepComponent";
+
 const OrderPage = () => {
     const order = useSelector((state) => state.order)
     const user = useSelector((state) => state.user)
@@ -32,6 +33,63 @@ const OrderPage = () => {
         address: '',
         // city: ''
     })
+    const fetchCart = async () => {
+        const res = await OrderService.getAllCartByUserId(user?.id, user?.access_token)
+        if (res.data.length > 0) {
+            const cartItems = res.data[0].orderItems;
+            const uniqueItems = cartItems.filter((cart, index, self) => {
+                return self.findIndex((item) => item.sizeId === cart.sizeId) === index;
+            });
+            if (order) {
+                dispatch(resetCart())
+                uniqueItems.forEach((cart) => {
+                    dispatch(
+                        addOrderProduct({
+                            orderItem: {
+                                name: cart.name,
+                                amount: cart.amount,
+                                image: cart.image,
+                                price: cart.price,
+                                product: cart.product,
+                                discount: cart.discount,
+                                sizeId: cart.sizeId,
+                                color: cart.color,
+                                size: cart.size,
+                            },
+                        })
+                    );
+                });
+            }
+        }
+    }
+
+    const mutationAddCart = useMutationHook(
+        async (data) => {
+            const {
+                token,
+                ...rests } = data
+            const res = await OrderService.createCart(
+                { ...rests }, token)
+            return res
+        },
+    )
+    const createCart = () => {
+        if (user?.access_token && order?.orderItems && user?.id) {
+            mutationAddCart.mutate({
+                token: user?.access_token,
+                orderItems: order?.orderItems,
+                user: user?.id,
+            })
+        }
+    }
+    const { isSuccess, status } = mutationAddCart
+    useEffect(() => {
+        createCart()
+        if (isSuccess && status === "success") {
+            fetchCart()
+        }
+    }, [order?.orderItems])
+
 
     const onChange = (e) => {
         if (listChecked.includes(e.target.value)) {
@@ -129,6 +187,7 @@ const OrderPage = () => {
             navigate('/payment')
         }
     }
+
     const mutationUpdate = useMutationHook(
         (data) => {
             const { id,

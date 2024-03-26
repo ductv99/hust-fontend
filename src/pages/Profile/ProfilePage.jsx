@@ -25,29 +25,36 @@ const ProfilePage = () => {
     const mutation = useMutationHook(
         (data) => {
             const { id, access_token, ...rests } = data
-            UserService.updateUser(id, rests, access_token)
+            const res = UserService.updateUser(id, rests, access_token)
+            return res
         })
     const dispatch = useDispatch();
 
-    const { data, isPending, isSuccess, isError } = mutation
+    const { isPending, isSuccess, isError } = mutation
 
     useEffect(() => {
-        setEmail(user.email);
-        setName(user.name);
-        setPhone(`0${user.phone}`);
-        setAddress(user.address);
-        setAvatar(user.avatar);
+        setEmail(user?.email);
+        setName(user?.name);
+        setPhone(`0${user?.phone}`);
+        setAddress(user?.address);
+        setAvatar(user?.avatar);
     }, [user])
 
     useEffect(() => {
-        if (isSuccess && data?.status === "success") {
-            message.success()
+        if (isSuccess) {
             handleGetDetailsUser(user?.id, user?.access_token)
+            message.success()
         } else if (isError) {
             message.error()
         }
-
     }, [isSuccess, isError])
+
+    const handleGetDetailsUser = async (id, token) => {
+        const res = await UserService.getDetailsUser(id, token)
+        console.log("y", res?.data)
+        dispatch(updateUser({ ...res?.data, access_token: token }))
+    }
+
 
     const handleOnchangeEmail = (value) => {
         setEmail(value)
@@ -70,16 +77,8 @@ const ProfilePage = () => {
     }
 
 
-    const handleGetDetailsUser = async (id, token) => {
-        const res = await UserService.getDetailsUser(id, token)
-        dispatch(updateUser({ ...res?.data, access_token: token }))
-    }
-
     const handleUpdate = () => {
         mutation.mutate({ id: user?.id, email, name, phone, address, avatar, access_token: user?.access_token })
-        message.success()
-        // console.log("ud", email, name, phone, address, avatar)
-        // window.location.reload();
     }
     return (
         <div className='body' style={{ width: '100%', backgroundColor: '#efefef', }}>
