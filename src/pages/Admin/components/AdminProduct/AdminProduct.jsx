@@ -61,7 +61,7 @@ const AdminProduct = () => {
     )
     const mutationDelete = useMutationHook(
         (data) => {
-            const { id, access_token, } = data
+            const { id, access_token } = data
             const res = ProductService.deleteProduct(id, access_token)
             return res
         },
@@ -285,7 +285,7 @@ const AdminProduct = () => {
 
     const handleDeleteManyProduct = (ids) => {
         // console.log("idDelete", _id)
-        mutationDeleteMany.mutate({ ids: ids, token: user?.access_token },
+        mutationDeleteMany.mutate({ ids: ids, access_token: user?.access_token },
             {
                 onSettled: () => {
                     queryProduct.refetch()
@@ -417,8 +417,6 @@ const AdminProduct = () => {
             countInStock,
             type,
         } = stateProductDetail;
-
-        console.log(type)
         mutationUpdate.mutate({
             id: rowSelected,
             name,
@@ -430,7 +428,7 @@ const AdminProduct = () => {
             discount,
             countInStock,
             type: stateProductDetail.type === "add_type" ? stateProductDetail.newType : stateProductDetail.type,
-            token: user?.access_token,
+            access_token: user?.access_token,
         }, {
             onSettled: () => {
                 queryProduct.refetch()
@@ -459,7 +457,7 @@ const AdminProduct = () => {
 
     const DeleteProduct = () => {
         // console.log(rowSelected)
-        mutationDelete.mutate({ id: rowSelected, token: user?.access_token },
+        mutationDelete.mutate({ id: rowSelected, access_token: user?.access_token },
             {
                 onSettled: () => {
                     queryProduct.refetch()
@@ -967,12 +965,12 @@ const AdminProduct = () => {
                         <Form.Item
                             label="Giảm giá"
                             name="discount"
-                            // rules={[
-                            //     {
-                            //         required: true,
-                            //         message: 'Vui lòng nhập giảm giá',
-                            //     },
-                            // ]}
+                        // rules={[
+                        //     {
+                        //         required: true,
+                        //         message: 'Vui lòng nhập giảm giá',
+                        //     },
+                        // ]}
                         >
                             <InputComponent value={setStateProduct.discount} onChange={handleOnchange} name="discount" />
                         </Form.Item>
@@ -1128,12 +1126,12 @@ const AdminProduct = () => {
                         <Form.Item
                             label="Giảm giá"
                             name="discount"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng điền giảm giá',
-                                },
-                            ]}
+                        // rules={[
+                        //     {
+                        //         required: true,
+                        //         message: 'Vui lòng điền giảm giá',
+                        //     },
+                        // ]}
                         >
                             <InputComponent value={setStateProductDetail.discount} onChange={handleOnchangeDetail} name="discount" />
                         </Form.Item>

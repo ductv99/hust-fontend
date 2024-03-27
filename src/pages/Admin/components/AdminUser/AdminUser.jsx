@@ -128,7 +128,7 @@ const AdminUser = () => {
 
     const DeleteUser = () => {
         console.log(rowSelected)
-        mutationDelete.mutate({ id: rowSelected, token: user?.access_token },
+        mutationDelete.mutate({ id: rowSelected, access_token: user?.access_token },
             {
                 onSettled: () => {
                     queryUser.refetch()
@@ -139,11 +139,12 @@ const AdminUser = () => {
 
     const mutationUpdate = useMutationHook(
         (data) => {
-            // console.log("dataaa", data)
             const {
                 id,
                 access_token,
                 ...rests } = data
+            console.log("dataaa", access_token)
+
             const res = UserService.updateUser(id, { ...rests }, access_token)
             return res
         },
@@ -192,7 +193,7 @@ const AdminUser = () => {
     }, [isSuccessDeleteMany])
     const handleDeleteManyUser = (ids) => {
         // console.log("idDelete", _id)
-        mutationDeleteMany.mutate({ ids: ids, token: user?.access_token },
+        mutationDeleteMany.mutate({ ids: ids, access_token: user?.access_token },
             {
                 onSettled: () => {
                     queryUser.refetch()
@@ -207,7 +208,7 @@ const AdminUser = () => {
         mutationUpdate.mutate({
             id: rowSelected,
             isAdmin,
-            token: user?.access_token,
+            access_token: user?.access_token,
         }, {
             onSettled: () => {
                 queryUser.refetch()
@@ -267,7 +268,6 @@ const AdminUser = () => {
                     isLoading={isLoading}
                     handleDeleteMany={handleDeleteManyUser}
                     onRow={(record, rowIndex) => {
-                        console.log('x', record)
                         return {
                             onClick: event => {
                                 setRowSelected(record._id)

@@ -56,7 +56,12 @@ const MyOrderPage = () => {
     }, [isErrorCancle, isSuccessCancel])
 
     const handleDetailsOrder = (id) => {
-        navigate(`/details-order/${id}`)
+        navigate(`/details-order/${id}`, {
+            state: {
+                token: user?.access_token
+            }
+        }
+        )
     }
     const renderProduct = (data) => {
         return data?.map((order) => {

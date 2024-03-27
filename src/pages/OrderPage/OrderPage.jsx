@@ -83,12 +83,21 @@ const OrderPage = () => {
         }
     }
     const { isSuccess, status } = mutationAddCart
+
     useEffect(() => {
-        createCart()
-        if (isSuccess && status === "success") {
-            fetchCart()
+        let isCreateCartDone = false;
+
+        const handleCreateCart = async () => {
+            await createCart();
+            isCreateCartDone = true;
+        };
+
+        handleCreateCart();
+
+        if (isSuccess && status === "success" && isCreateCartDone) {
+            fetchCart();
         }
-    }, [order?.orderItems])
+    }, [order.orderItems]);
 
 
     const onChange = (e) => {
@@ -110,6 +119,7 @@ const OrderPage = () => {
     const handleDeleteOrder = (sizeId) => {
         dispatch(removeOrderProduct({ sizeId }))
     }
+
     const handleRemoveAllOrder = () => {
         if (listChecked?.length > 0) {
             dispatch(removeAllOrderProduct({ listChecked }))

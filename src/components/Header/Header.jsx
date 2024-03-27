@@ -61,7 +61,6 @@ const Header = ({ isHisddensearch = false, isHisddenCart = false }) => {
             const uniqueItems = cartItems.filter((cart, index, self) => {
                 return self.findIndex((item) => item.sizeId === cart.sizeId) === index;
             });
-            console.log(uniqueItems)
             if (order) {
                 dispatch(resetCart())
                 uniqueItems.forEach((cart) => {

@@ -17,6 +17,7 @@ const DetailsOrderPage = () => {
     const { id } = params
 
     const fetchDetailsOrder = async () => {
+        console.log("deatil", id, state?.token)
         const res = await OrderService.getDetailsOrder(id, state?.token)
         return res.data
     }

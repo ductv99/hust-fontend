@@ -55,7 +55,7 @@ const HomePage = () => {
             </div >
 
             <div className='body' style={{ width: '100%', backgroundColor: '#efefef', }}>
-                <div id="container" style={{ height: '1000px', width: '1280px', margin: '0 auto' }}>
+                <div id="container" style={{ height: '100%', width: '1280px', margin: '0 auto', paddingBottom: '10px' }}>
                     <Banner />
                     <WrapperProducts>
                         {products?.data?.map((product) => {

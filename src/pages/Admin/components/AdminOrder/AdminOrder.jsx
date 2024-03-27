@@ -170,16 +170,17 @@ const AdminOrder = () => {
         (data) => {
             const {
                 id,
-                access_token,
+                token,
                 ...rests } = data
-            const res = OrderService.updateCartStatus(id, { ...rests }, access_token)
+            console.log("xxx", token)
+            const res = OrderService.updateCartStatus(id, { ...rests }, token)
             return res
         },
     )
     const { isPending: isPendingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate
 
     const fetchGetDetailCart = async (rowSelected) => {
-        const res = await OrderService.getDetailsOrder(rowSelected, user?.access_token)
+        const res = await OrderService.getDetailsOrder(rowSelected, user.access_token)
         if (res?.data) {
             setStatusOrders({
                 statusOrder: res?.data?.statusOrder,
@@ -214,14 +215,18 @@ const AdminOrder = () => {
     }
     const handleDetailOrder = () => {
         if (rowSelected) {
-            navigate(`/details-order/${rowSelected}`)
+            navigate(`/details-order/${rowSelected}`, {
+                state: {
+                    token: user?.access_token
+                }
+            })
         }
     }
-    useEffect(() => {
-        if (rowSelected) {
-            navigate(`/details-order/${rowSelected}`)
-        }
-    }, [rowSelected])
+    // useEffect(() => {
+    //     if (rowSelected) {
+    //         navigate(`/details-order/${rowSelected}`)
+    //     }
+    // }, [rowSelected])
 
     const handleCloseDrawer = () => {
         setIsOpenDrawer(false);
@@ -230,8 +235,8 @@ const AdminOrder = () => {
     const onUpdateStatusOrder = () => {
         mutationUpdate.mutate({
             id: rowSelected,
-            statusOrders,
             token: user?.access_token,
+            statusOrders,
         }, {
             onSettled: () => {
                 queryOrder.refetch()

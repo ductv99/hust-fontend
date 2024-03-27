@@ -79,6 +79,8 @@ export const getAllCartByUserId = async (id, access_token) => {
 }
 
 export const updateCartStatus = async (id, data, access_token) => {
+    console.log("token", access_token)
+
     const res = await axiosJWT.put(`${process.env.REACT_APP_API_KEY}/order/update-cart-status/${id}`, data, {
         headers: {
             token: `Bearer ${access_token}`

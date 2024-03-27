@@ -26,7 +26,7 @@ const ProductDetails = ({ idProduct }) => {
     const navigate = useNavigate()
     const order = useSelector((state) => state.order)
     const location = useLocation()
-    const [numberProduct, setNumberProduct] = useState(0)
+    const [numberProduct, setNumberProduct] = useState(1)
     const user = useSelector((state) => state?.user)
     // const order = useSelector((state) => state.order)
     const dispatch = useDispatch()
@@ -152,13 +152,28 @@ const ProductDetails = ({ idProduct }) => {
         }
     }
     const { isSuccess, status } = mutationAddCart
-    useEffect(() => {
-        createCart()
-        if (isSuccess && status === "success") {
-            fetchCart()
-        }
-    }, [order])
+    // useEffect(() => {
+    //     createCart()
+    //     // console.log("rrrr", create)
+    //     if (isSuccess && status === "success") {
+    //         fetchCart()
+    //     }
+    // }, [order.orderItems])
 
+    useEffect(() => {
+        let isCreateCartDone = false;
+
+        const handleCreateCart = async () => {
+            await createCart();
+            isCreateCartDone = true;
+        };
+
+        handleCreateCart();
+
+        if (isSuccess && status === "success" && isCreateCartDone) {
+            fetchCart();
+        }
+    }, [order.orderItems]);
 
     const [selectedImage, setSelectedImage] = useState(productDetail?.image[0]);
 
@@ -274,7 +289,7 @@ const ProductDetails = ({ idProduct }) => {
                     <div style={{ margin: '5px 0 5px', padding: '5px 0', borderTop: '1px solid #e5e5e5' }}>
                         <span style={{ fontWeight: 'bold' }}>Size:</span>
                         <div style={{ display: 'flex', flexDirection: 'row', gap: 10, paddingTop: '5px' }}>
-                            {selectedSizes?.map((item) => item.quantity === 0 ? "Sản phẩm tạm thời hết hàng" : <div
+                            {/* {selectedSizes?.map((item) => item.quantity === 0 ? "Sản phẩm tạm thời hết hàng" : <div
                                 key={item?._id}
                                 style={{
                                     width: '28px',
@@ -292,7 +307,27 @@ const ProductDetails = ({ idProduct }) => {
                                 <div style={{ width: '25px', height: '25px', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                     {item.size}
                                 </div>
-                            </div>)}
+                            </div>)} */}
+                            {selectedSizes?.map((item) =>
+                                <div
+                                    key={item?._id}
+                                    style={{
+                                        width: '28px',
+                                        height: '28px',
+                                        border: `1px solid ${selectedSize === item.size ? 'red' : 'rgb(11, 119, 226)'}`,
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={() => {
+                                        handleSizeClick(item.size);
+                                    }}
+                                >
+                                    <div style={{ width: '25px', height: '25px', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        {item.size}
+                                    </div>
+                                </div>)}
                         </div>
                     </div>
 
@@ -309,9 +344,9 @@ const ProductDetails = ({ idProduct }) => {
                                 </button>
                             </div>
                         </WrapperQualityProduct>
-                        {
+                        {/* {
                             selectedSizes?.map((item) => item.quantity < numberProduct ? "Sản phẩm không đủ số lượng" : "")
-                        }
+                        } */}
                     </div>
                     <div style={{ display: 'flex', aliggItems: 'center', gap: '12px' }}>
                         <div>
